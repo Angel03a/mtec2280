@@ -1,0 +1,60 @@
+import processing.serial.*;
+
+Serial myPort; 
+int shapeWidth = 100;  //Rectangle width
+int shapeHeight = 100;  //Rectangle height
+int circleSize = 100;  //Size of circle
+int shapeColor = color(255, 0, 0);  //Color red for the shape
+boolean isCircle = true;  //Check for circle
+int buttonState = 0;  
+int potentiometerValue = 0;  //save potentiometer value
+int photocellValue = 0;
+
+void setup() {
+  size(400, 400);
+  String portName = Serial.list()[0];
+  myPort = new Serial(this, portName, 9600);
+}
+
+void draw() {
+  background(255);
+  if (myPort.available() > 0) {
+    String data = myPort.readStringUntil('\n'); 
+    if (data != null) {
+      String[] values = split(data, ',');  //Split the data into values
+      if (values.length >= 3) {
+        buttonState = int(values[0]);
+        potentiometerValue = int(values[1]);
+        photocellValue = int(values[2]);
+        if (potentiometerValue < 512) { //Make shape a rectangle
+          isCircle = true;  //Turn into a circle
+        } else {
+          isCircle = false;  //Turn into a Rectangle
+        }
+        
+        if (photocellValue < 512) { //Make the shape big if it's dark
+          shapeWidth = 200;
+          shapeHeight = 200;
+          circleSize = 200;
+        } else {              // Make the shape small if it's lighten up
+          shapeWidth = 100;
+          shapeHeight = 100;
+          circleSize = 100;
+        }
+
+        //Change color when the button is pressed
+        if (buttonState == HIGH) {
+          shapeColor = color(random(255), random(255), random(255));  //Randomize color
+        }
+      }
+    }
+  }
+  fill(shapeColor); //Draw shape
+  noStroke();
+
+  if (isCircle) {
+    ellipse(width / 2, height / 2, circleSize, circleSize); //Draw circle
+  } else {
+    rect(width / 2 - shapeWidth / 2, height / 2 - shapeHeight / 2, shapeWidth, shapeHeight);     //Draw rectangle
+  }
+}
