@@ -1,0 +1,11 @@
+const int buttonPin = 12;  // Button connected to pin 2
+const int potentiometerPin = 11; 
+const int photocellPin = 10; 
+
+int buttonState = 0;
+int potentiometerValue = 0;
+int photocellValue = 0;  
+
+void setup() {
+  pinMode(buttonPin, INPUT); 
+  Serial.begin(9600);
